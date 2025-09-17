@@ -28,19 +28,14 @@ async function getDashboardData(query) {
 
   const [destinations, weathers, airports] = await Promise.all(promises);
 
-  const destination = destinations[0];
-  const weather = weathers[0];
-  const airport = airports[0];
-
   return {
-    city: destination ? destination.name : null,
-    country: destination ? destination.country : null,
-    temperature: weather ? weather.temperature : null,
-    weather: weather ? weather.weather_description : null,
-    airport: airport ? airport.name : null,
+    city: destinations[0]?.name ?? null,
+    country: destinations[0]?.country ?? null,
+    temperature: weathers[0]?.temperature ?? null,
+    weather: weathers[0]?.weather_description ?? null,
+    airport: airports[0]?.name ?? null,
   };
 }
-
 getDashboardData("Vienna")
   .then((data) => {
     console.log("Dasboard data:", data);
