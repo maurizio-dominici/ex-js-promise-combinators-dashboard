@@ -26,17 +26,39 @@ async function getDashboardData(query) {
 
   const promises = [destinantionPromise, weathersPromise, airportsPromise];
 
-  const [destinations, weathers, airports] = await Promise.all(promises);
+  const [destinationsResults, weathersResults, airportsResults] =
+    await Promise.allSettled(promises);
 
-  return {
-    city: destinations[0]?.name ?? null,
-    country: destinations[0]?.country ?? null,
-    temperature: weathers[0]?.temperature ?? null,
-    weather: weathers[0]?.weather_description ?? null,
-    airport: airports[0]?.name ?? null,
-  };
+  const data = {};
+
+  if (destinationsResults.status === "rejected") {
+    console.error("Problema in destination :", destinationsResults.reason);
+    data.city = null;
+    data.country = null;
+  } else {
+    data.city = destinationsResults.value[0]?.name ?? null;
+    data.country = destinationsResults.value[0]?.country ?? null;
+  }
+  if (weathersResults.status === "rejected") {
+    console.error("Problema in weathers :", weathersResults.reason);
+    data.temperature = null;
+    data.weather = null;
+  } else {
+    data.temperature = weathersResults.value[0]?.temperature ?? null;
+    data.weather = weathersResults.value[0]?.weather_description ?? null;
+  }
+  if (airportsResults.status === "rejected") {
+    console.error("Problema in Airports :", airportsResults.reason);
+    data.airport = null;
+  } else {
+    data.airport = airportsResults.value[0]?.name ?? null;
+  }
+
+  console.log(weathersResults);
+
+  return data;
 }
-getDashboardData("Vienna")
+getDashboardData("london")
   .then((data) => {
     console.log("Dasboard data:", data);
     let frase = "";
